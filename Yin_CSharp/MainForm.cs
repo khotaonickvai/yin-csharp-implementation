@@ -2,6 +2,7 @@
 using OxyPlot;
 using OxyPlot.Series;
 using OxyPlot.WindowsForms;
+using System.Diagnostics;
 
 namespace Yin_CSharp
 {
@@ -58,7 +59,7 @@ namespace Yin_CSharp
             // Set dialog properties (optional)
             openFileDialog.Title = "Select a File";
             //openFileDialog.Filter = "Text Files (*.txt)|*.txt|All Files (*.*)|*.*"; // Set file filter
-            openFileDialog.InitialDirectory = "C:\\"; // Set initial directory (optional)
+            
             openFileDialog.Multiselect = false; // Allow multiple file selection (optional)
 
             // Show the dialog and check if the user selected a file
@@ -73,8 +74,9 @@ namespace Yin_CSharp
 
         private void btnTest_Click(object sender, EventArgs e)
         {
+            PreprocessFile();
             var yin = new YinAgorithm();
-            var f0 = yin.Main(txtInput.Text,w_len: 2048,w_step:256);
+            var f0 = yin.Main("outTest.wav", w_len: 2048,w_step:256);
             labelF0.Text = f0.ToString();
         }
 
@@ -93,6 +95,21 @@ namespace Yin_CSharp
             plotModel.Series.Clear();
             plotModel.Series.Add(series);
             plotModel.PlotView.InvalidatePlot();
+        }
+
+        private void PreprocessFile()
+        {
+            ProcessStartInfo processStartInfo = new ProcessStartInfo();
+            processStartInfo.UseShellExecute = false;
+          
+            processStartInfo.CreateNoWindow = true;
+            processStartInfo.Arguments = $" -i \"{txtInput.Text}\" -vn -acodec pcm_s16le -ar 44100 -ac 1 -y outTest.wav";
+            processStartInfo.FileName = "ffmpeg_new.exe";
+
+            Process process = new Process();
+            process.StartInfo = processStartInfo;
+            process.Start();
+            process.WaitForExit();
         }
     }
 }

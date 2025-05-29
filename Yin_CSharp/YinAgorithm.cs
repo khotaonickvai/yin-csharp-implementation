@@ -157,7 +157,14 @@ namespace Yin_CSharp
         public double GetMainFreq(double[] avgFrames, double[] pitches, float threadHold)
         {
             var avg = avgFrames.Max();
-            var prioPitches = pitches.Where((p, i) => avgFrames[i]/avg > threadHold).ToArray();
+            var prioPitches = pitches.Where((p, i) => avgFrames[i]/avg > threadHold).ToList();
+            for ( var i = prioPitches.Count - 1; i >= 0; i--)
+            {
+                if (prioPitches[i] == 0)
+                {
+                    prioPitches.RemoveAt(i);
+                }
+            }
             return prioPitches.Min();
         }
         public static (int, double[]) AudioRead(string filePath)
